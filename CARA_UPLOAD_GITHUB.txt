@@ -1,0 +1,16 @@
+SEMESTA UNTUKMU - KHUSUS GITHUB PAGES 💜
+
+1. Ekstrak ZIP ini.
+2. Buka github.com dan buat repository (misalnya: ulang-tahun).
+3. Masuk repository > Add file > Upload files.
+4. Upload SEMUA ISI folder ini (index.html, style.css, config.js, script.js, assets, dst.) ke ROOT repository, BUKAN file ZIP-nya.
+5. Commit changes.
+6. Settings > Pages > Deploy from a branch > main > /(root) > Save.
+7. Tunggu beberapa menit; buka https://USERNAME.github.io/NAMA-REPO/
+
+Edit nama, isi surat, foto, lagu, dan tanggal di config.js.
+Masukkan foto-1.jpg sampai foto-6.jpg ke folder photos/ kalau sudah siap.
+
+TIDAK PERLU REPLIT / NODE / npm / BUILD.
+
+BACA README.md untuk petunjuk lengkap.

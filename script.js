@@ -145,7 +145,7 @@
     </section>`;
 
   app.innerHTML = `
-    <header class="top-bar" aria-label="Semesta Kita">
+    <header class="top-bar" aria-label="Tanpe's day!">
       <div class="brand"><span class="brand-star">✳</span><span>semesta <strong>kita.</strong></span></div>
       <div class="music-wrapper">
         <span id="music-toast" class="music-toast" role="status" aria-live="polite"></span>
@@ -161,8 +161,8 @@
         ${decorations()}
         <div class="hero-copy">
           <span class="hero-hello">Hai, ${esc(config.friendName)} ♡</span>
-          <h1>Semesta <em>Kita</em></h1>
-          <p>25 foto. Banyak cerita. Dan satu orang yang selalu ingin aku rayakan.</p>
+          <h1>Semesta kecil untuk <em>Tanpe</em></h1>
+          <p>Special for your birthday!.</p>
         </div>
         <div class="countdown-panel" id="countdown-panel">
           <p class="countdown-caption" id="countdown-caption">Kejutannya terbuka dalam...</p>
@@ -293,6 +293,18 @@
   audio.addEventListener('pause', () => {audioPlaying = false;updateMusic();});
   audio.addEventListener('error', () => {audioPlaying = false;musicError='Lagu belum ada. Upload audio/lagu.mp3 ke GitHub.';updateMusic();});
   updateMusic();
+  // MODE PRATINJAU
+if (
+  new URLSearchParams(window.location.search)
+    .get('preview') === '1'
+) {
+  unlockAlbum();
+
+  captionBox.textContent = 'Mode Pratinjau 💜';
+
+  helpBox.textContent =
+    'Kamu sedang melihat seluruh isi website. Countdown asli tetap berjalan.';
+}
   countdownTick();
   setInterval(countdownTick, 1000);
   window.addEventListener('focus',countdownTick);

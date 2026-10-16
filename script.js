@@ -92,7 +92,7 @@
     <div class="screen-action"><button class="continue-btn return-btn" type="button" data-step="restart">↶ Kembali ke Awal</button></div>
   </section>`;
   root.innerHTML = `<div class="ambient" aria-hidden="true"><span class="amb-dot ad-1">✦</span><span class="amb-dot ad-2">✳</span><span class="amb-dot ad-3">✧</span></div>
-    <header class="site-header"><div class="logo"><span>✳</span> semesta kita<span class="logo-period">.</span></div><div class="music-cluster"><span id="music-feedback" role="status" aria-live="polite"></span><button id="music-control" type="button" class="music-control" aria-label="Putar musik" aria-pressed="false"><span id="music-icon">▶</span><span id="music-text">Play</span></button></div></header>
+    <header class="site-header"><div class="logo"><span>✳</span> Little saturn <span class="logo-period">.</span></div><div class="music-cluster"><span id="music-feedback" role="status" aria-live="polite"></span><button id="music-control" type="button" class="music-control" aria-label="Putar musik" aria-pressed="false"><span id="music-icon">▶</span><span id="music-text">Play</span></button></div></header>
     <main id="screen-root" class="screen-root"></main><div id="screen-counter" class="screen-counter" aria-live="polite"></div>
     <div id="transition-cover" class="transition-cover" hidden aria-hidden="true"></div>
     <dialog id="photo-dialog" class="photo-dialog"><div class="dialog-card"><button class="dialog-close" type="button" aria-label="Tutup foto">✕</button><div class="dialog-visual image-wrap"></div><div class="dialog-caption"></div></div></dialog>

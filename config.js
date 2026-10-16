@@ -8,12 +8,12 @@
   Tidak perlu Replit, npm, atau build.
 */
 window.BIRTHDAY_CONFIG = {
-  friendName: 'Kamu',
-  senderName: 'Aku',
+  friendName: 'Tanpee',
+  senderName: 'Rifaa',
   birthdayTimestamp: '2026-10-27T00:00:00+07:00', // 27 Oktober 2026, 00.00 WIB
   song: {
     url: 'audio/lagu.mp3',
-    title: 'Lagu kita',
+    title: 'play some song!',
   },
   photos: [
     { src: 'photos/foto-01.jpg', caption: 'Kita, di salah satu hari favoritku' },
@@ -43,13 +43,10 @@ window.BIRTHDAY_CONFIG = {
     { src: 'photos/foto-25.jpg', caption: 'Dan kita, masih punya banyak hari lagi' },
   ],
   letter: {
-    title: 'Untuk kamu, yang paling spesial',
+    title: 'Ini buat Tanpeee',
     paragraphs: [
-      'Selamat ulang tahun! Aku nggak tahu bagaimana caranya membungkus semua kenangan kita jadi satu hadiah. Jadi aku susun satu-satu di sini.',
-      'Ada foto yang rapi, ada yang kocak, ada yang mungkin biasa saja buat orang lain. Tapi buat aku, semuanya punya tempat sendiri.',
-      'Terima kasih sudah jadi bagian dari cerita yang pengin aku ulang terus. Semoga tahun ini membawa banyak hal baik, pelukan hangat, dan hari-hari yang bikin kamu tersenyum.',
-      'Dan semoga, nanti, kita bisa menambahkan lebih banyak foto lagi. 💜',
+      'Habedee bestttt! Inilah teteh teteh tingkat akhir ituu.. Makasi ya pee udah bertahan sejauh iniii, udah berjuang selama inii, aku gak pinter nulis kata-kata, jadi aku buat spontan aja ya, semoga dunia selalu baik sama kamu untuk kedepannya juga, selalu dibersamai orang-orang baik, selalu merasa bersyukur, seberat apapun ujiannya selalu diberikan kemudahan dan kekuatan, emang jadi manusia itu gak luput dari sakit, sedih, dan kecewa, tapi semoga dalam semua prosesnya kamu dibarengi kasih sayang Allah, orangtua, dan semua yang sayang kamu. 💜',
     ],
-    closing: 'Dengan semua sayang yang ada,',
+    closing: 'Dengan semua sayang yang ada, rifa',
   },
 };

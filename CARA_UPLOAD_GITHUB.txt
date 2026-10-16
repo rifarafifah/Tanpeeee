@@ -1,16 +1,13 @@
-SEMESTA UNTUKMU - KHUSUS GITHUB PAGES 💜
+CARA UPLOAD GITHUB PAGES
 
-1. Ekstrak ZIP ini.
-2. Buka github.com dan buat repository (misalnya: ulang-tahun).
-3. Masuk repository > Add file > Upload files.
-4. Upload SEMUA ISI folder ini (index.html, style.css, config.js, script.js, assets, dst.) ke ROOT repository, BUKAN file ZIP-nya.
-5. Commit changes.
-6. Settings > Pages > Deploy from a branch > main > /(root) > Save.
-7. Tunggu beberapa menit; buka https://USERNAME.github.io/NAMA-REPO/
+1. Ekstrak file ZIP.
+2. Di GitHub, buat repo baru atau gunakan repo yang lama.
+3. Upload seluruh isi folder, khususnya index.html, style.css, script.js, config.js, favicon.svg.
+4. Masukkan 25 foto ke folder photos dengan nama foto-01.jpg s.d. foto-25.jpg.
+5. Masukkan lagu MP3 berizin ke folder audio dengan nama lagu.mp3.
+6. Buka Settings > Pages > Deploy from a branch > main > /(root) > Save.
 
-Edit nama, isi surat, foto, lagu, dan tanggal di config.js.
-Masukkan foto-1.jpg sampai foto-6.jpg ke folder photos/ kalau sudah siap.
+EDIT TEKS, FOTO, LAGU, TANGGAL: buka config.js.
+TIDAK PERLU REPLIT / NPM / BUILD.
 
-TIDAK PERLU REPLIT / NODE / npm / BUILD.
-
-BACA README.md untuk petunjuk lengkap.
+CATATAN: GitHub Pages dari repository publik menampilkan foto secara publik.

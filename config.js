@@ -16,7 +16,7 @@ window.BIRTHDAY_CONFIG = {
     title: 'play some song!',
   },
   photos: [
-    { src: 'foto-01.jpeg', caption: 'Kita, di salah satu hari favoritku' },
+    { src: 'foto-01.jpeg', caption: 'Halo twinss' },
     { src: 'foto-02.jpeg', caption: 'Hehe' },
     { src: 'foto-03.jpeg', caption: 'Inii cahayanya lucuu' },
     { src: 'foto-04.jpeg', caption: 'Satu jepretan lagi!' },

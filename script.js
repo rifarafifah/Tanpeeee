@@ -76,7 +76,7 @@
   ];
   const planet = `<div class="hero-planet" aria-hidden="true"><span class="planet-halo"></span>${art('saturn','planet-svg')}${art('astronaut','astronaut-svg')}<span class="planet-doodle p1">✧</span><span class="planet-doodle p2">✦</span><span class="planet-doodle p3">♡</span></div>`;
   const hero = () => `<section class="screen intro-screen" aria-label="Pembuka dan hitung mundur">
-      <div class="hero-grid"><div class="intro-copy"><div class="chapter-overline">A little universe, just for you · ✦</div><div class="salutation">Hai, ${safe(config.friendName)} ♡</div><h1>Semesta<br><i>Kita</i><span class="title-spark">✳</span></h1><p class="intro-desc">25 foto, banyak cerita, dan satu orang yang selalu bikin setiap hari terasa istimewa.</p></div>${planet}</div>
+      <div class="hero-grid"><div class="intro-copy"><div class="chapter-overline">A little universe, just for you · ✦</div><div class="salutation">Hai, ${safe(config.friendName)} ♡</div><h1>Little<br><i>Saturn</i><span class="title-spark">✳</span></h1><p class="intro-desc">This is special for you to see, a random thing hehehe.</p></div>${planet}</div>
       <div class="countdown-panel"><span class="countdown-label" id="countdown-label">Menunggu hari spesialmu…</span><div class="countdown-values" id="countdown-values"></div><div class="countdown-foot" id="countdown-foot"></div></div>
       <div class="screen-action" id="intro-action" hidden><button class="continue-btn" type="button" data-step="forward">Buka album kita <span>↗</span></button></div>
       ${preview ? '<span class="preview-mark">MODE PRATINJAU</span>' : ''}

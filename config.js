@@ -1,9 +1,9 @@
 // Edit teks, foto, tanggal, dan musik di file ini. Tidak perlu instal apa pun.
 window.BIRTHDAY_CONFIG = {
-  friendName: 'Sahabatku',
-  senderName: 'Sahabatmu',
-  birthdayTimestamp: '2026-10-27T00:00:00+07:00',
-  heroTagline: 'Satu planet ungu mungil, dikirim khusus buat kamu.',
+  friendName: 'Tanpee',
+  senderName: 'Rifaa',
+  birthdayTimestamp: '2026-10-16T00:00:00+07:00',
+  heroTagline: 'Satu planet mungil, dikirim khusus buat kamu.',
   photos: [
     { src: 'photos/foto-1.jpg', caption: 'Hari pertama kita ngakak sampai lupa waktu', date: 'Suatu hari yang cerah', alt: 'Foto kenangan pertama', tilt: -4 },
     { src: 'photos/foto-2.jpg', caption: 'Nongkrong "sebentar" yang berujung lima jam', date: 'Sore yang kepanjangan', alt: 'Foto kenangan nongkrong', tilt: 3 },
@@ -28,7 +28,7 @@ window.BIRTHDAY_CONFIG = {
       'Di usia yang baru ini, aku cuma mau kamu tahu: kamu berharga bahkan saat kamu nggak produktif, nggak ceria, nggak punya jawaban. Kamu boleh pelan. Kamu boleh capek. Aku tetap di sini.',
       'Semoga kita masih punya banyak sore kepanjangan, banyak jajan random, dan banyak cerita yang diulang-ulang sampai tua.',
     ],
-    closing: 'Dengan sayang, dari planet ungu mungil',
+    closing: 'Dengan sayang, dari rifa straykids',
   },
   // Isi url dengan "audio/lagu.mp3" setelah file ditaruh di folder audio/. Kosong = belum diatur.
   song: { url: '', title: 'Lagu Untukmu' },

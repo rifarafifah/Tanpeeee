@@ -59,214 +59,228 @@
       <span class="photo-zoom" aria-hidden="true">↗</span>
     </button>`;
   };
-  const sectionTitle = (label, title, desc = '') => `<div class="section-heading reveal-on-scroll">
-    <span class="eyebrow">${label}</span><h2>${title}</h2>${desc ? `<p>${desc}</p>` : ''}
+
+  let stage;
+  let unlocked = false;
+  let chapter = 0;
+  let isTransitioning = false;
+  let lastEffect = -1;
+  const preview = new URLSearchParams(window.location.search).get('preview') === '1';
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  const chapters = [
+    {title:'Tiga yang pertama', sub:'01—03 · Polaroid', desc:'Ini bukan bukti kita fotogenik. Tapi tetap aku simpan. 😭', action:'📸 Jepret lagi, tapi jangan kedip!', style:'polaroid'},
+    {title:'Senyum dulu, cekrek!', sub:'04—07 · Photobooth', desc:'Empat foto, ekspresi kita makin mencurigakan.', action:'🫣 Awas, ada yang salting!', style:'booth'},
+    {title:'Random tapi favorit', sub:'08—11 · Scrapbook', desc:'Foto boleh berantakan, yang penting orangnya sama.', action:'🛸 Diculik alien dulu bentar', style:'scrap'},
+    {title:'Film paling nggak jelas', sub:'12—16 · Film roll', desc:'Kita pemeran utama. Budget filmnya: dua cilok.', action:'🎬 CUT! Aktornya kabur!', style:'film'},
+    {title:'Kartu pos nyasar', sub:'17—19 · Postcard', desc:'Dikirim dari tempat yang isinya cuma kenangan kita.', action:'💌 Kirim ke planet sebelah', style:'postcard'},
+    {title:'Kita di antara bintang', sub:'20—25 · Rasi bintang', desc:'Bintang banyak. Tapi album ini cuma tentang kita.', action:'✨ Bintangnya pada rusuh!', style:'stars'},
+  ];
+  const frames = [[0,1,2],[3,4,5,6],[7,8,9,10],[11,12,13,14,15],[16,17,18],[19,20,21,22,23,24]];
+  const effects = [
+    {name:'boing', emoji:'🐸', title:'BOING!', note:'Kodok antariksa ikut campur.'},
+    {name:'error', emoji:'🤡', title:'ERROR 404: JAIM NOT FOUND', note:'Ketahuan senyum sendiri, ya?'},
+    {name:'orbit', emoji:'🪐', title:'NYASAR KE PLANET LAIN', note:'Tenang, GPS-nya pake perasaan.'},
+    {name:'toss', emoji:'🧻', title:'FOTO-NYA TERBANGGG', note:'Anginnya dari mana coba 😭'},
+    {name:'stamp', emoji:'💌', title:'DI-STEMPEL GEMES', note:'Dilarang protes, capnya permanen.'},
+    {name:'shake', emoji:'🥔', title:'LOADING KENTANG…', note:'Kentang ini sedang bekerja keras.'},
+    {name:'rocket', emoji:'🚀', title:'WUSSS KEBABLASAN!', note:'Ups… ini masih jalurnya, kok.'},
+  ];
+
+  const head = (chapterInfo, i) => `<div class="chapter-heading">
+      <div class="eyebrow">${esc(chapterInfo.sub)}</div>
+      <h2>${esc(chapterInfo.title)}</h2>
+      <p>${esc(chapterInfo.desc)}</p>
+    </div>`;
+  const footer = (buttonText, isEnd = false) => `<div class="scene-footer">
+    <span class="scene-mini">${isEnd ? 'udah sampai ujung semesta ♡' : 'Ketuk foto untuk melihat lebih dekat ✨'}</span>
+    <button type="button" class="surprise-button" data-go="${isEnd ? 'restart' : 'advance'}">${esc(buttonText)} <span aria-hidden="true">✦</span></button>
   </div>`;
+  const figure = (n, cls = '') => `<div class="memory-photo ${cls}">${photo(n)}<span class="memory-caption" title="${esc(photos[n].caption)}">${esc(photos[n].caption)}</span></div>`;
 
-  const scenes = () => `
-    <section class="album-intro reveal-on-scroll" aria-label="Pembuka album">
-      <span class="little-spark">✦ &nbsp; 25 keping kenangan &nbsp; ✦</span>
-      <h2>Kalau kenangan punya bentuk,<br><em>mungkin akan seperti ini.</em></h2>
-      <p>Nggak harus rapi. Nggak harus sempurna. Yang penting ada kita berdua di dalamnya.</p>
-    </section>
+  const bodyOfChapter = (i) => {
+    if (i === 0) return `<div class="photo-stage polaroid-stage" aria-label="Tiga foto bergaya polaroid">
+      ${frames[i].map((n,k) => `<div class="polaroid" style="--i:${k}"><span class="tape"></span>${figure(n)}<span class="polaroid-mark">♡ 0${k+1}</span></div>`).join('')}
+      <span class="float-note">kok lucu ya kita?? ↗</span>
+    </div>`;
+    if (i === 1) return `<div class="photo-stage booth-stage-new" aria-label="Empat foto photobooth">
+      <div class="booth-sticker-new">SAY CHEESE! 📷</div>
+      ${[0,1].map(k => `<div class="booth-column" style="--tilt:${k ? 4 : -4}deg"><div class="booth-title">KITA . PHOTOBOOTH ✷</div>
+        ${frames[i].slice(k*2,k*2+2).map(n => figure(n,'booth-memory')).join('')}
+        <div class="booth-bottom">♥ &nbsp; one more, please! &nbsp; ♥</div>
+      </div>`).join('')}
+      <div class="booth-star">✳</div>
+    </div>`;
+    if (i === 2) return `<div class="photo-stage scrapbook-stage" aria-label="Empat foto scrapbook">
+      <span class="scrap-decoration deco-a">✿</span><span class="scrap-decoration deco-b">♡</span>
+      ${frames[i].map((n,k) => `<div class="scrap-photo scrap-n-${k+1}"><span class="pin" aria-hidden="true"></span>${figure(n)}</div>`).join('')}
+      <span class="scrap-label">ketempel terus<br>di ingatan ♡</span>
+    </div>`;
+    if (i === 3) return `<div class="photo-stage cinema-stage" aria-label="Lima foto rol film">
+      <div class="sprocket top"></div>
+      <div class="film-memories">${frames[i].map((n,k) => `<div class="film-photo"><span class="frame-counter">FRAME 0${k+1}</span>${figure(n)}</div>`).join('')}</div>
+      <div class="sprocket bottom"></div>
+    </div>`;
+    if (i === 4) return `<div class="photo-stage postcards-stage" aria-label="Tiga foto kartu pos">
+      ${frames[i].map((n,k) => `<div class="postcard-new card-${k+1}"><div class="stamp">✳<small>OUR DAYS</small></div>
+      ${figure(n)}<span class="postcard-line">Wish you were here ♡</span></div>`).join('')}
+      <span class="postal-mark">PRIORITY MAIL ✦</span>
+    </div>`;
+    return `<div class="photo-stage constellations-stage" aria-label="Enam foto di antara bintang">
+      <span class="asterism star-a">✦</span><span class="asterism star-b">✷</span><span class="asterism star-c">✳</span>
+      ${frames[i].map((n,k) => `<div class="star-card star-card-${k+1}">${figure(n)}</div>`).join('')}
+    </div>`;
+  };
+  const chapterScene = i => `<section class="scene chapter-scene scene-${chapters[i].style}" data-chapter="${i+1}" aria-label="${esc(chapters[i].title)}">
+    ${head(chapters[i],i)}
+    ${bodyOfChapter(i)}
+    ${footer(chapters[i].action)}
+  </section>`;
 
-    <section class="memory-section polaroid-section" aria-labelledby="polaroid-title">
-      ${sectionTitle('01 — 03 • polaroid', '<span id="polaroid-title">Tiga yang pertama</span>', 'Kita mulai dari yang sederhana: foto-foto yang pengin ditempel di dinding.')}
-      <div class="polaroid-scatter">
-        ${[0,1,2].map((n,j) => `<div class="polaroid-card reveal-on-scroll" style="--tilt:${[-8,5,-5][j]}deg;--delay:${j * 110}ms">
-          <span class="washi ${j===1?'washi-pink':''}" aria-hidden="true"></span>
-          ${photo(n)}<span class="scribble">${esc(photos[n].caption)}</span><span class="polaroid-index">№ 0${n+1} ♡</span>
-        </div>`).join('')}
-      </div>
-      <span class="floating-label">ini kita! ↗</span>
-    </section>
+  const heroScene = () => `<section class="scene hero-scene" id="awal" aria-label="Pembuka dan hitung mundur">
+    <div class="hero-center">
+      <p class="hero-kicker">A little universe, just for you ✦</p>
+      ${decorations()}
+      <div class="hero-copy"><span class="hero-hello">Hai, ${esc(config.friendName)} ♡</span><h1>Semesta <em>Kita</em></h1>
+      <p>25 foto kita berdua. Satu hadiah kecil yang sengaja dibuat agak nggak waras. 💜</p></div>
+      <div class="countdown-panel" id="countdown-panel"><p class="countdown-caption" id="countdown-caption">Kejutannya terbuka dalam...</p>
+      <div id="countdown" class="countdown-grid" role="timer" aria-live="off"></div>
+      <p id="countdown-help" class="countdown-help">Album baru bisa dibuka tanggal 27 Oktober 2026, pukul 00.00 WIB.</p></div>
+      ${preview ? '<p class="preview-chip">👀 MODE PRATINJAU • hanya untuk mengecek tampilan</p>' : ''}
+    </div>
+    <div class="scene-footer hero-footer" id="hero-footer" hidden>
+      <span class="scene-mini">Ada 25 foto dan 7 kejutan kecil di depan…</span>
+      <button class="surprise-button" type="button" data-go="advance">🚀 Gas ke album kita! <span aria-hidden="true">✦</span></button>
+    </div>
+  </section>`;
 
-    <section class="memory-section booth-section" aria-labelledby="booth-title">
-      ${sectionTitle('04 — 07 • photobooth','<span id="booth-title">Senyum dulu, cekrek!</span>','Empat kali jepret, empat momen yang nggak mau dibuang.')}
-      <div class="booth-stage">
-        <div class="booth-sticker sticker-top">say cheese! ♡</div>
-        <div class="booth-strip reveal-on-scroll">
-          <div class="booth-brand">OUR <b>PHOTOBOOTH</b> <span>✷</span></div>
-          ${[3,4,5,6].map(n=> `<div class="booth-shot">${photo(n)}<small>✦ ${esc(photos[n].caption)}</small></div>`).join('')}
-          <div class="booth-footer">together looks good on us &nbsp; ♥ &nbsp; 2026</div>
-        </div>
-        <span class="booth-sticker sticker-bottom">little moments,<br>big feelings ✿</span>
-      </div>
-    </section>
+  const letterScene = () => `<section class="scene final-scene" aria-label="Surat ulang tahun">
+    <div class="chapter-heading"><div class="eyebrow">Sampai juga di akhir perjalanan</div><h2>Eh… ada satu lagi! 💌</h2>
+      <p>Foto sudah selesai. Tapi ini mau aku bilang langsung ke kamu.</p></div>
+    <div class="letter-shell"><article class="letter-paper">
+       <span class="letter-tape" aria-hidden="true"></span>
+       <p class="letter-for">A little note for ${esc(config.friendName)} ♡</p>
+       <h3>${esc(config.letter?.title || 'Untukmu')}</h3>
+       <div class="letter-body">${(config.letter?.paragraphs || []).map(p=>`<p>${esc(p)}</p>`).join('')}</div>
+       <p class="letter-closing">${esc(config.letter?.closing || 'Dengan sayang,')}</p>
+       <p class="letter-signature">${esc(config.senderName)}</p>
+       <span class="letter-seal">♡</span>
+    </article></div>
+    ${footer('↩ Kembali ke Awal', true)}
+  </section>`;
 
-    <section class="memory-section scrapbook-section" aria-labelledby="scrapbook-title">
-      ${sectionTitle('08 — 11 • scrapbook','<span id="scrapbook-title">Yang random justru berkesan</span>','Ditempel, ditumpuk, dan disimpan. Persis kayak isi kepala kalau lagi ingat kamu.')}
-      <div class="scrapbook-board reveal-on-scroll">
-        <span class="scrap-doodle d1">♡</span><span class="scrap-doodle d2">✳</span><span class="scrap-doodle d3">☼</span>
-        ${[7,8,9,10].map((n,j)=> `<div class="scrap-item scrap-${j+1}"><div class="scrap-pin" aria-hidden="true"></div>${photo(n)}<span class="scrap-caption">${esc(photos[n].caption)}</span></div>`).join('')}
-        <div class="scrap-note">Psst…<br>klik fotonya<br>biar gede! ↗</div>
-      </div>
-    </section>
-
-    <section class="memory-section film-section" aria-labelledby="film-title">
-      ${sectionTitle('12 — 16 • film roll','<span id="film-title">Sedikit adegan dari cerita kita</span>','Bayangin ini potongan film, dan kita pemeran utamanya.')}
-      <div class="film-scroll" aria-label="Lima foto bergaya rol film, geser mendatar untuk melihat semuanya">
-        <div class="film-track">
-          ${[11,12,13,14,15].map((n,j)=> `<div class="film-cell"><span class="film-number">FRAME ${String(j+1).padStart(2,'0')}</span>${photo(n)}<span class="film-caption">${esc(photos[n].caption)}</span></div>`).join('')}
-        </div>
-      </div>
-      <p class="scroll-hint">← geser filmnya ke samping →</p>
-    </section>
-
-    <section class="memory-section postcard-section" aria-labelledby="postcard-title">
-      ${sectionTitle('17 — 19 • postcards','<span id="postcard-title">Salam dari hari-hari kita</span>','Tiga kartu pos dari momen yang rasanya pengin dikunjungi lagi.')}
-      <div class="postcard-stack">
-        ${[16,17,18].map((n,j)=> `<div class="postcard reveal-on-scroll" style="--delay:${j*110}ms"><div class="postcard-photo">${photo(n)}</div><div class="postcard-writing"><span class="postcard-stamp">✳<small>OUR DAYS</small></span><span class="postcard-to">TO: YOU ♡</span><p>${esc(photos[n].caption)}</p><span class="postcard-from">from, us</span></div></div>`).join('')}
-      </div>
-    </section>
-
-    <section class="memory-section stars-section" aria-labelledby="stars-title">
-      ${sectionTitle('20 — 25 • constellation','<span id="stars-title">Enam bintang terakhir</span>','Dari semua semesta yang mungkin, aku senang kita punya kenangan yang sama.')}
-      <div class="constellation-grid reveal-on-scroll">
-        ${[19,20,21,22,23,24].map((n,j)=> `<div class="star-photo star-pos-${j+1}">${photo(n)}<span>${String(n+1).padStart(2,'0')} ✦ ${esc(photos[n].caption)}</span></div>`).join('')}
-      </div>
-      <p class="constellation-ending">25 foto selesai, tapi ceritanya belum. ✧</p>
-    </section>
-
-    <section class="final-section" aria-labelledby="letter-title">
-      <div class="final-cloud c1" aria-hidden="true">✿</div><div class="final-cloud c2" aria-hidden="true">✧</div>
-      <div class="letter-paper reveal-on-scroll">
-        <span class="washi" aria-hidden="true"></span>
-        <p class="letter-for">A little note for ${esc(config.friendName)} ♡</p>
-        <h2 id="letter-title">${esc(config.letter?.title || 'Untukmu')}</h2>
-        <div class="letter-body">${(config.letter?.paragraphs || []).map(p=>`<p>${esc(p)}</p>`).join('')}</div>
-        <p class="letter-closing">${esc(config.letter?.closing || 'Dengan sayang,')}</p>
-        <p class="letter-signature">${esc(config.senderName)}</p>
-        <span class="letter-seal">♡</span>
-      </div>
-      <div class="end-actions"><span>the end… or maybe the beginning? ✷</span>
-        <button type="button" id="back-to-start" class="back-to-start">↥ Kembali ke Awal</button>
-      </div>
-    </section>`;
-
-  app.innerHTML = `
-    <header class="top-bar" aria-label="Tanpe's day!">
-      <div class="brand"><span class="brand-star">✳</span><span>semesta <strong>kita.</strong></span></div>
-      <div class="music-wrapper">
-        <span id="music-toast" class="music-toast" role="status" aria-live="polite"></span>
-        <button type="button" id="music-btn" class="music-btn" aria-label="Putar lagu" aria-pressed="false">
-          <span id="music-symbol" class="music-symbol" aria-hidden="true">▶</span><span id="music-label">Play</span>
-        </button>
-      </div>
+  app.innerHTML = `<header class="top-bar"><div class="brand"><span class="brand-star">✳</span>semesta <strong>kita.</strong></div>
+    <div class="music-wrapper"><span id="music-toast" class="music-toast" role="status" aria-live="polite"></span>
+      <button type="button" id="music-btn" class="music-btn" aria-label="Putar lagu" aria-pressed="false"><span id="music-symbol" class="music-symbol">▶</span><span id="music-label">Play</span></button></div>
     </header>
-    <main>
-      <section class="hero" id="awal">
-        <div class="hero-glow" aria-hidden="true"></div>
-        <p class="hero-kicker">A little universe, just for you ✦</p>
-        ${decorations()}
-        <div class="hero-copy">
-          <span class="hero-hello">Hai, ${esc(config.friendName)} ♡</span>
-          <h1>Semesta kecil untuk <em>Tanpe</em></h1>
-          <p>Special for your birthday!.</p>
-        </div>
-        <div class="countdown-panel" id="countdown-panel">
-          <p class="countdown-caption" id="countdown-caption">Kejutannya terbuka dalam...</p>
-          <div id="countdown" class="countdown-grid" role="timer" aria-live="off"></div>
-          <p id="countdown-help" class="countdown-help">Album akan terbuka otomatis setelah hitung mundur selesai. 💜</p>
-        </div>
-        <div id="scroll-invite" class="scroll-invite" hidden><span>Scroll untuk buka album kenangan kita</span><span aria-hidden="true">⌄</span></div>
-      </section>
-      <div id="album" class="album" hidden></div>
-    </main>
+    <main id="stage" class="stage" aria-live="off"></main>
+    <div class="chapter-index" id="chapter-index" aria-label="Posisi dalam album"></div>
+    <div class="transition-layer" id="transition-layer" hidden aria-hidden="true">
+      <div class="transition-sparks" aria-hidden="true">✦ &nbsp; ✳ &nbsp; ♡ &nbsp; ✷</div>
+      <div class="transition-emoji" id="transition-emoji">🪐</div><strong id="transition-title">WUSSS!</strong>
+      <p id="transition-note">Kita ke foto berikutnya…</p>
+    </div>
     <dialog id="lightbox" class="lightbox" aria-label="Foto kenangan diperbesar"></dialog>
-    <audio id="background-music" preload="none" loop></audio>
-  `;
-  const countdownBox = document.getElementById('countdown');
-  const helpBox = document.getElementById('countdown-help');
-  const captionBox = document.getElementById('countdown-caption');
-  const albumBox = document.getElementById('album');
+    <audio id="background-music" preload="none" loop></audio>`;
+  stage = document.getElementById('stage');
+  audio = document.getElementById('background-music');
   const musicButton = document.getElementById('music-btn');
   const musicLabel = document.getElementById('music-label');
   const musicSymbol = document.getElementById('music-symbol');
   const musicToast = document.getElementById('music-toast');
-  audio = document.getElementById('background-music');
-  // Muat lagu hanya saat tombol Play ditekan supaya tidak memunculkan error saat halaman baru dibuka.
-  const errorImage = event => {
-    const im = event.target;
-    if (im instanceof HTMLImageElement && im.closest('.photo-image')) {
-      im.closest('.photo-image').classList.add('missing');
-    }
-  };
-  document.addEventListener('error', errorImage, true);
+  const transitionLayer = document.getElementById('transition-layer');
 
-  function attachPhotoInteractions() {
-    albumBox.addEventListener('click', event => {
-      const button = event.target.closest('[data-open-photo]');
-      if (button) openPhoto(Number(button.dataset.openPhoto));
-    });
-    albumBox.querySelector('#back-to-start')?.addEventListener('click', () => {
-      document.getElementById('awal').scrollIntoView({behavior:'smooth',block:'start'});
-    });
-    if ('IntersectionObserver' in window) {
-      const observer = new IntersectionObserver(entries => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('seen');
-            observer.unobserve(entry.target);
-          }
-        }
-      },{rootMargin:'0px 0px 60px 0px',threshold:0.05});
-      albumBox.querySelectorAll('.reveal-on-scroll').forEach(el => observer.observe(el));
-    } else {
-      albumBox.querySelectorAll('.reveal-on-scroll').forEach(el => el.classList.add('seen'));
-    }
+  function showProgress() {
+    const label = chapter === 0 ? 'Hadiah untukmu' : chapter === 7 ? 'Surat terakhir' : `${chapter} / 6 · ${chapters[chapter - 1].style}`;
+    document.getElementById('chapter-index').textContent = label;
   }
-
   function openPhoto(index) {
     const p = photos[index];
-    if (!p) return;
+    if (!p || !unlocked) return;
     const dialog = document.getElementById('lightbox');
-    const src = pathToUrl(p.src);
     dialog.innerHTML = `<div class="lightbox-content">
       <button type="button" class="lightbox-close" aria-label="Tutup foto">✕</button>
-      <div class="lightbox-image photo-image"><img src="${esc(src)}" alt="${esc(p.caption)}"><span class="photo-placeholder"><strong>Foto ${String(p.number).padStart(2,'0')}</strong><small>Masukkan ${esc(p.src)} ke GitHub</small></span></div>
+      <div class="lightbox-image photo-image"><img src="${esc(pathToUrl(p.src))}" alt="${esc(p.caption)}"><span class="photo-placeholder"><strong>Foto ${String(p.number).padStart(2,'0')}</strong><small>Upload ${esc(p.src)}</small></span></div>
       <p><span>✦ ${String(p.number).padStart(2,'0')} / 25</span> ${esc(p.caption)}</p>
     </div>`;
     dialog.querySelector('.lightbox-close').addEventListener('click', () => dialog.close());
-    dialog.onclick = event => {if (event.target === dialog) dialog.close();};
-    dialog.querySelector('img')?.addEventListener('error', event => event.target.parentElement.classList.add('missing'), {once:true});
-    if (typeof dialog.showModal === 'function') dialog.showModal();
-    else dialog.setAttribute('open','');
+    dialog.onclick = event => { if (event.target === dialog) dialog.close(); };
+    dialog.querySelector('img').addEventListener('error',e=>e.currentTarget.parentElement.classList.add('missing'),{once:true});
+    if (typeof dialog.showModal === 'function') dialog.showModal(); else dialog.setAttribute('open','');
   }
+  document.addEventListener('error', e => {
+    if (e.target instanceof HTMLImageElement) e.target.closest('.photo-image')?.classList.add('missing');
+  },true);
+  document.addEventListener('click', e => {
+    const photoButton = e.target.closest('[data-open-photo]');
+    if (photoButton) return openPhoto(Number(photoButton.dataset.openPhoto));
+    const go = e.target.closest('[data-go]');
+    if (go) navigate(go.dataset.go);
+  });
 
-  function unlockAlbum() {
-    if (revealed) return;
-    revealed = true;
-    albumBox.hidden = false;
-    albumBox.innerHTML = scenes();
-    captionBox.textContent = 'Hari spesialmu akhirnya tiba!';
-    helpBox.textContent = 'Yuk, lihat 25 keping kenangan yang sudah aku siapkan untuk kita. ✨';
-    document.getElementById('countdown-panel').classList.add('is-open');
-    document.getElementById('scroll-invite').hidden = false;
-    attachPhotoInteractions();
+  function render() {
+    stage.innerHTML = chapter === 0 ? heroScene() : chapter === 7 ? letterScene() : chapterScene(chapter-1);
+    showProgress();
+    stage.querySelectorAll('img').forEach(img => {
+      if (img.complete && img.naturalWidth === 0) img.closest('.photo-image')?.classList.add('missing');
+    });
+    if (chapter === 0) countdownTick();
+    stage.querySelector('.scene')?.focus?.({preventScroll:true});
+  }
+  function chooseEffect() {
+    // Hindari animasi yang sama dua kali berturut-turut.
+    const index = lastEffect === -1 ? Math.floor(Math.random() * effects.length) : (lastEffect + 1 + Math.floor(Math.random() * (effects.length - 1))) % effects.length;
+    lastEffect = index;
+    return effects[index];
+  }
+  function navigate(action) {
+    if (isTransitioning) return;
+    if (action === 'advance' && !unlocked) return; // Bukan sekadar tombol yang terkunci.
+    if (action === 'advance' && chapter >= 7) return;
+    if (action !== 'advance' && action !== 'restart') return;
+    isTransitioning = true;
+    const next = action === 'restart' ? 0 : chapter + 1;
+    const effect = chooseEffect();
+    const swapScene = () => { chapter = next; render(); };
+    if (reducedMotion.matches) {swapScene();isTransitioning=false;return;}
+    transitionLayer.hidden = false;
+    transitionLayer.className = `transition-layer effect-${effect.name}`;
+    document.getElementById('transition-emoji').textContent = effect.emoji;
+    document.getElementById('transition-title').textContent = effect.title;
+    document.getElementById('transition-note').textContent = effect.note;
+    requestAnimationFrame(() => transitionLayer.classList.add('is-active'));
+    setTimeout(() => {
+      swapScene();
+      transitionLayer.classList.add('is-leaving');
+      setTimeout(() => {
+        transitionLayer.hidden = true;
+        transitionLayer.className = 'transition-layer';
+        isTransitioning = false;
+      }, 480);
+    }, 930);
   }
 
   function countdownTick() {
-    if (!Number.isFinite(target)) {
-      countdownBox.innerHTML = '<p class="countdown-error">Tanggal ulang tahun salah. Cek birthdayTimestamp di config.js.</p>';
+    if (chapter !== 0) return;
+    const countdownBox = document.getElementById('countdown');
+    const help = document.getElementById('countdown-help');
+    const caption = document.getElementById('countdown-caption');
+    const footer = document.getElementById('hero-footer');
+    if (!countdownBox || !help || !caption || !footer) return;
+    if (!Number.isFinite(target)) { countdownBox.innerHTML = '<p class="countdown-error">Tanggal salah. Periksa birthdayTimestamp di config.js.</p>'; return; }
+    unlocked = preview || isUnlocked();
+    footer.hidden = !unlocked;
+    if (unlocked) {
+      countdownBox.innerHTML = '<div class="birthday-message"><strong>Happy Birthday! 🎂</strong><span>Album 25 foto sudah bisa dibuka ♡</span></div>';
+      help.textContent = preview && !isUnlocked() ? 'Pratinjau aktif. Link biasa tetap menunggu tanggal ulang tahun.' : 'Akhirnya boleh lihat kenangan kita!';
+      caption.textContent = preview && !isUnlocked() ? 'Lihat-lihat dulu, yuk!' : 'Hari spesialmu akhirnya tiba!';
       return;
     }
-    if (isUnlocked()) {
-      countdownBox.innerHTML = '<div class="birthday-message"><strong>Happy Birthday! 🎂</strong><span>Hari ini, semua kenangan kita boleh terbuka ♡</span></div>';
-      unlockAlbum();
-      return;
-    }
-    // Album tidak dibuat di DOM sebelum tanggalnya tiba.
-    const remaining = Math.max(0, Math.floor((target - Date.now()) / 1000));
-    const time = [Math.floor(remaining / 86400), Math.floor((remaining % 86400) / 3600), Math.floor((remaining % 3600) / 60), remaining % 60];
+    const seconds = Math.max(0, Math.ceil((target - Date.now()) / 1000));
+    const time = [Math.floor(seconds/86400),Math.floor(seconds%86400/3600),Math.floor(seconds%3600/60),seconds%60];
     const labels = ['hari','jam','menit','detik'];
-    if (!countdownBox.querySelector('.count-unit')) {
-      countdownBox.innerHTML = time.map((n,i) => `<div class="count-unit"><span id="count-${i}" class="count-value">${String(n).padStart(2,'0')}</span><span class="count-label">${labels[i]}</span></div>`).join('');
-    } else {
-      time.forEach((n,i) => {const el = document.getElementById(`count-${i}`); if (el) el.textContent = String(n).padStart(2,'0');});
-    }
+    countdownBox.innerHTML = time.map((v,i)=>`<div class="count-unit"><span class="count-value">${String(v).padStart(2,'0')}</span><span class="count-label">${labels[i]}</span></div>`).join('');
   }
-
   function updateMusic() {
     musicLabel.textContent = audioPlaying ? 'Pause' : 'Play';
     musicSymbol.textContent = audioPlaying ? '❚❚' : '▶';
@@ -281,32 +295,17 @@
       if (audio.paused) {
         if (!audio.getAttribute('src')) audio.src = pathToUrl(config.song?.url || 'audio/lagu.mp3');
         await audio.play();
-      }
-      else audio.pause();
-    } catch (_) {
-      musicError = 'Lagu belum ada. Upload audio/lagu.mp3 ke GitHub.';
-    }
+      } else audio.pause();
+    } catch (_) {musicError='Lagunya belum ada. Upload audio/lagu.mp3 ke GitHub.';}
     audioPlaying = !audio.paused;
     updateMusic();
   });
-  audio.addEventListener('play', () => {audioPlaying = true;musicError='';updateMusic();});
-  audio.addEventListener('pause', () => {audioPlaying = false;updateMusic();});
-  audio.addEventListener('error', () => {audioPlaying = false;musicError='Lagu belum ada. Upload audio/lagu.mp3 ke GitHub.';updateMusic();});
+  audio.addEventListener('play',()=>{audioPlaying=true;musicError='';updateMusic()});
+  audio.addEventListener('pause',()=>{audioPlaying=false;updateMusic()});
+  audio.addEventListener('error',()=>{audioPlaying=false;musicError='Lagunya belum ada. Upload audio/lagu.mp3 ke GitHub.';updateMusic()});
   updateMusic();
-  // MODE PRATINJAU
-if (
-  new URLSearchParams(window.location.search)
-    .get('preview') === '1'
-) {
-  unlockAlbum();
-
-  captionBox.textContent = 'Mode Pratinjau 💜';
-
-  helpBox.textContent =
-    'Kamu sedang melihat seluruh isi website. Countdown asli tetap berjalan.';
-}
-  countdownTick();
-  setInterval(countdownTick, 1000);
+  render();
+  setInterval(countdownTick,1000);
   window.addEventListener('focus',countdownTick);
-  document.addEventListener('visibilitychange', () => {if (!document.hidden) countdownTick();});
+  document.addEventListener('visibilitychange',()=>{if (!document.hidden) countdownTick()});
 })();
